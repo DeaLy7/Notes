@@ -27,8 +27,9 @@ namespace Notes.ConsoleApp
             var pankRepository = new PankRepository(dbContext);
             var pankService = new PankService(pankRepository);
             var pankController = new PankControllers(pankService);
-            Note test = new Note();
+            Note test;
             bool Exit = false;
+
             
             while (!Exit) 
             {
