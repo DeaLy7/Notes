@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace Notes.ConsoleApp.Controllers
 {
-    public class PankControllers
+    public class NoteControllers
     {
-        private readonly IPankService _pankService;
-        public PankControllers (IPankService pankService)
+        private readonly INoteService _pankService;
+        public NoteControllers (INoteService pankService)
         {
             _pankService = pankService;
         }
@@ -37,10 +37,21 @@ namespace Notes.ConsoleApp.Controllers
         {
             return _pankService.GetNoteById(id);
         }
-        public List<Note> GetAllNotes()
+        public List<Note> GetAllNotes(int userId)
         {
-            return _pankService.GetAllNotes();
+            return _pankService.GetAllNotes(userId);
         }
-
+        public void CreateUser(User user)
+        {
+            _pankService.CreateUser(user);
+        }
+        public List<User> GetAllUsers()
+        {
+            return _pankService.GetAllUsers();
+        }
+        public User LogIn(User user)
+        {
+            return _pankService.LogIn(user);
+        }
     }
 }

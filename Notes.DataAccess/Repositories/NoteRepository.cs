@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Notes.DataAccess.Repositories
 {
-    public class PankRepository : IPankRepository
+    public class NoteRepository : INoteRepository
     {
         private readonly NotesDbContext _context;
-        public PankRepository (NotesDbContext context)
+        public NoteRepository (NotesDbContext context)
         {
             _context = context;
         }
@@ -42,10 +42,25 @@ namespace Notes.DataAccess.Repositories
         {
             return _context.Notes.Find(id);
         }
-        public List<Note> GetAllNotes()
+        public List<Note> GetAllNotes(int userId)
         {
-            return _context.Notes.ToList();
+            return _context.Notes.Where(u=> u.UserId == userId) .ToList();
         }
-       
+        
+        public void CreateUser(User user)
+        {
+            _context.Users.Add(user);
+            _context.SaveChanges();
+        }
+        public List<User> GetAllUsers()
+        {
+            return _context.Users.ToList();
+        }
+        public User LogIn(User user)
+        {
+            
+            return _context.Users.FirstOrDefault(u => u.UserName == user.UserName && u.Password == user.Password);
+        }
+
     }
 }

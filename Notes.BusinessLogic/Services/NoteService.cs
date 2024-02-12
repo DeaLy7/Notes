@@ -5,11 +5,11 @@ using Notes.DataAccess.Interfaces;
 
 namespace Notes.BusinessLogic.Services
 {
-    public class PankService : IPankService
+    public class NoteService : INoteService
     {
        
-            private readonly IPankRepository _pankRepository;
-            public PankService(IPankRepository context)
+            private readonly INoteRepository _pankRepository;
+            public NoteService(INoteRepository context)
             {
                 _pankRepository = context;
             }
@@ -29,9 +29,22 @@ namespace Notes.BusinessLogic.Services
             {
                 return _pankRepository.GetNoteById(id);
             }
-            public List<Note> GetAllNotes()
+            public List<Note> GetAllNotes(int userId)
             {
-                return _pankRepository.GetAllNotes();
+                return _pankRepository.GetAllNotes(userId);
+            }
+
+            public void CreateUser(User user)
+            {
+                _pankRepository.CreateUser(user);
+            }
+            public List<User> GetAllUsers()
+            {
+            return _pankRepository.GetAllUsers();
+            }
+            public User LogIn(User user)
+            {
+            return _pankRepository.LogIn(user);
             }
 
     }
