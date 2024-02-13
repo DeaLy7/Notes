@@ -22,9 +22,14 @@ namespace Notes.ConsoleApp
             dbContextOptionsBuilder.UseSqlite(connectionString);
 
             var dbContext = new NotesDbContext(dbContextOptionsBuilder.Options);
-            var pankRepository = new NoteRepository(dbContext);
-            var pankService = new NoteService(pankRepository);
-            var pankController = new NoteControllers(pankService);
+            var noteRepository = new NoteRepository(dbContext);
+            var noteService = new NoteService(noteRepository);
+            var noteController = new NoteControllers(noteService);
+            
+            var userRepository = new UserRepository(dbContext);
+            var userService = new UserService(userRepository);
+            var userController = new UserControllers(userService);
+
             Note note = new();
             User user = new();
             bool Exit = false;
@@ -45,7 +50,7 @@ namespace Notes.ConsoleApp
                             user.UserName = Console.ReadLine();
                             Console.Write("Password: ");
                             user.Password = Console.ReadLine();
-                            user = pankController.LogIn(user);
+                            user = userController.LogIn(user);
                             Console.Clear();
 
 
@@ -57,149 +62,138 @@ namespace Notes.ConsoleApp
                             Console.Write("Password: ");
                             string? newpassword = Console.ReadLine();
                             user = new User { UserName = userName, Password = newpassword };
-                            pankController.CreateUser(user);
+                            userController.CreateUser(user);
                             Console.Write("Success\n");
                             Console.ReadLine();
                             Console.Clear();
                             break;
 
-
                     }
 
-
-                    if (user.Id != 0)
-                    {
-
-
-                        Console.WriteLine("# # # # # Notes App # # # # #");
-                        Console.WriteLine("1 - View Notes | 2 - Create Note | 3 - Update Note | 4 - Delete Note | 5 - Log out | 0 - Exit");
-                        int number = Convert.ToInt32(Console.ReadLine());
-                        Console.Clear();
-                        switch (number)
-                        {
-                            case 1:
-                                Console.WriteLine("# # # # # Notes App # # # # # ");
-                                Console.WriteLine("Your notes:\r\n- - - - - - - - - - - -");
-                                var noteList = pankController.GetAllNotes(user.Id);
-                                if (noteList != null)
-                                {
-                                    foreach (var n in noteList.ToList())
-                                    {
-                                        Console.WriteLine($"Id: {n.Id} \r\nTitle: {n.Title}\r\nContent: {n.Content}\r\n - - - - - - - - - - - -");
-                                    }
-
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Заметки не найдены");
-                                }
-                                Console.Write("Success\n");
-                                Console.ReadLine();
-                                Console.Clear();
-                                break;
-                            case 2:
-                                Console.WriteLine("# # # # # Notes App # # # # # \r\nCreating new note:");
-                                note = new Note();
-                                Console.Write("Title: ");
-                                note.Title = Console.ReadLine();
-                                Console.Write("Content: ");
-                                note.Content = Console.ReadLine();                              
-                                note.UserId = user.Id;
-                                pankController.AddNote(note);
-                                Console.Write("Success\n");
-                                Console.ReadLine();
-                                Console.Clear();
-                                break;
-                            case 3:
-                                Console.WriteLine("# # # # # Notes App # # # # # \r\nUpdating note:");
-
-
-                                if (pankController.GetNoteById != null)
-                                {
-                                    Console.WriteLine("У вас нет записей, чтобы их редактировать");
-                                    Console.ReadLine();
-                                    Console.Clear();
-                                    break;
-
-                                }
-                                else
-                                {
-                                    foreach (var n in pankController.GetAllNotes(user.Id).ToList())
-                                    {
-                                        Console.WriteLine($"Id: {n.Id} \r\nTitle: {n.Title}\r\nContent: {n.Content}\r\n - - - - - - - - - - - -");
-                                    }
-                                }
-                                Console.Write("Напишите Id заметки, чтобы её изменить: ");
-                                int id = Convert.ToInt32(Console.ReadLine());
-                                var noteFind = pankController.GetNoteById(id);
-                                if (noteFind != null)
-                                {
-                                    noteFind.Title = Console.ReadLine();
-                                    noteFind.Content = Console.ReadLine();
-                                    pankController.UpdateNote(noteFind);
-
-                                }
-                                Console.Write("Success\n");
-                                Console.ReadLine();
-                                Console.Clear();
-                                break;
-                            case 4:
-                                Console.WriteLine("# # # # # Notes App # # # # # \r\nDeleting note:");
-                                pankController.GetAllNotes(user.Id);
-                                if (pankController.GetNoteById != null)
-                                {
-                                    Console.WriteLine("У вас нет записей, чтобы их редактировать");
-                                    Console.ReadLine();
-                                    Console.Clear();
-                                    break;
-
-                                }
-                                else
-                                {
-                                    foreach (var n in pankController.GetAllNotes(user.Id).ToList())
-                                    {
-                                        Console.WriteLine($"Id: {n.Id} \r\nTitle: {n.Title}\r\nContent: {n.Content}\r\n - - - - - - - - - - - -");
-                                        Console.WriteLine();
-                                    }
-                                }
-                                Console.Write("Напишите Id заметки, чтобы её удалить: ");
-                                id = Convert.ToInt32(Console.ReadLine());
-                                noteFind = pankController.GetNoteById(id);
-                                if (noteFind != null)
-                                {
-                                    pankController.RemoveNote(noteFind);
-
-                                }
-                                Console.Write("Success\n");
-                                Console.ReadLine();
-                                Console.Clear();
-                                break;
-                            case 5:
-                                user.Id = 0;
-                                Console.Clear();
-                                break;
-
-
-                            case 0:
-                                Exit = true;
-                                break;
-                        }
-                    }
                 }
+                if (user.Id != 0)
+                {
+
+
+                    Console.WriteLine("# # # # # Notes App # # # # #");
+                    Console.WriteLine("1 - View Notes | 2 - Create Note | 3 - Update Note | 4 - Delete Note | 5 - Log out | 0 - Exit");
+                    int number = Convert.ToInt32(Console.ReadLine());
+                    Console.Clear();
+                    switch (number)
+                    {
+                        case 1:
+                            Console.WriteLine("# # # # # Notes App # # # # # ");
+                            Console.WriteLine("Your notes:\r\n- - - - - - - - - - - -");
+                            var noteList = noteController.GetAllNotes(user.Id);
+                            if (noteList != null)
+                            {
+                                foreach (var n in noteList.ToList())
+                                {
+                                    Console.WriteLine($"Id: {n.Id} \r\nTitle: {n.Title}\r\nContent: {n.Content}\r\n - - - - - - - - - - - -");
+                                }
+
+                            }
+                            else
+                            {
+                                Console.WriteLine("Заметки не найдены");
+                            }
+                            Console.Write("Success\n");
+                            Console.ReadLine();
+                            Console.Clear();
+                            break;
+                        case 2:
+                            Console.WriteLine("# # # # # Notes App # # # # # \r\nCreating new note:");
+                            note = new Note();
+                            Console.Write("Title: ");
+                            note.Title = Console.ReadLine();
+                            Console.Write("Content: ");
+                            note.Content = Console.ReadLine();
+                            note.UserId = user.Id;
+                            noteController.AddNote(note);
+                            Console.Write("Success\n");
+                            Console.ReadLine();
+                            Console.Clear();
+                            break;
+                        case 3:
+                            Console.WriteLine("# # # # # Notes App # # # # # \r\nUpdating note:");
+
+
+                            if (noteController.GetNoteById != null)
+                            {
+                                Console.WriteLine("У вас нет записей, чтобы их редактировать");
+                                Console.ReadLine();
+                                Console.Clear();
+                                break;
+
+                            }
+                            else
+                            {
+                                foreach (var n in noteController.GetAllNotes(user.Id).ToList())
+                                {
+                                    Console.WriteLine($"Id: {n.Id} \r\nTitle: {n.Title}\r\nContent: {n.Content}\r\n - - - - - - - - - - - -");
+                                }
+                            }
+                            Console.Write("Напишите Id заметки, чтобы её изменить: ");
+                            int id = Convert.ToInt32(Console.ReadLine());
+                            var noteFind = noteController.GetNoteById(id);
+                            if (noteFind != null)
+                            {
+                                noteFind.Title = Console.ReadLine();
+                                noteFind.Content = Console.ReadLine();
+                                noteController.UpdateNote(noteFind);
+
+                            }
+                            Console.Write("Success\n");
+                            Console.ReadLine();
+                            Console.Clear();
+                            break;
+                        case 4:
+                            Console.WriteLine("# # # # # Notes App # # # # # \r\nDeleting note:");
+                            noteController.GetAllNotes(user.Id);
+                            if (noteController.GetNoteById == null)
+                            {
+                                Console.WriteLine("У вас нет записей для удаления");
+                                Console.ReadLine();
+                                Console.Clear();
+                                break;
+
+                            }
+                            else
+                            {
+                                foreach (var n in noteController.GetAllNotes(user.Id).ToList())
+                                {
+                                    Console.WriteLine($"Id: {n.Id} \r\nTitle: {n.Title}\r\nContent: {n.Content}\r\n - - - - - - - - - - - -");
+                                    Console.WriteLine();
+                                }
+                            }
+                            Console.Write("Напишите Id заметки, чтобы её удалить: ");
+                            id = Convert.ToInt32(Console.ReadLine());
+                            noteFind = noteController.GetNoteById(id);
+                            if (noteFind != null)
+                            {
+                                noteController.RemoveNote(noteFind);
+
+                            }
+                            Console.Write("Success\n");
+                            Console.ReadLine();
+                            Console.Clear();
+                            break;
+                        case 5:
+                            user.Id = 0;
+                            Console.Clear();
+                            break;
+
+
+                        case 0:
+                            Exit = true;
+                            break;
+                    }
+
+                }
+
 
             }
 
-
-
-
-
-
-
         }
-
-
-
-
-
     }
 }

@@ -8,44 +8,30 @@ namespace Notes.BusinessLogic.Services
     public class NoteService : INoteService
     {
        
-            private readonly INoteRepository _pankRepository;
+            private readonly INoteRepository _noteRepository;
             public NoteService(INoteRepository context)
             {
-                _pankRepository = context;
+                _noteRepository = context;
             }
             public void AddNote(Note note)
             {
-                _pankRepository.AddNote(note);
+                _noteRepository.AddNote(note);
             }
             public void RemoveNote(Note note)
             {
-                _pankRepository.RemoveNote(note);
+                _noteRepository.RemoveNote(note);
             }
             public void UpdateNote(Note note)
             {
-                _pankRepository.UpdateNote(note);
+                _noteRepository.UpdateNote(note);
             }
             public Note? GetNoteById(int id)
             {
-                return _pankRepository.GetNoteById(id);
+                return _noteRepository.GetNoteById(id);
             }
             public List<Note> GetAllNotes(int userId)
             {
-                return _pankRepository.GetAllNotes(userId);
+                return _noteRepository.GetAllNotes(userId);
             }
-
-            public void CreateUser(User user)
-            {
-                _pankRepository.CreateUser(user);
-            }
-            public List<User> GetAllUsers()
-            {
-            return _pankRepository.GetAllUsers();
-            }
-            public User LogIn(User user)
-            {
-            return _pankRepository.LogIn(user);
-            }
-
     }
 }

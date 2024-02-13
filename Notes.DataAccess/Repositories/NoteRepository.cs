@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Notes.DataAccess.Data;
 using Notes.DataAccess.Data.Models;
 using Notes.DataAccess.Interfaces;
 using System;
@@ -45,22 +46,6 @@ namespace Notes.DataAccess.Repositories
         public List<Note> GetAllNotes(int userId)
         {
             return _context.Notes.Where(u=> u.UserId == userId) .ToList();
-        }
-        
-        public void CreateUser(User user)
-        {
-            _context.Users.Add(user);
-            _context.SaveChanges();
-        }
-        public List<User> GetAllUsers()
-        {
-            return _context.Users.ToList();
-        }
-        public User LogIn(User user)
-        {
-            
-            return _context.Users.FirstOrDefault(u => u.UserName == user.UserName && u.Password == user.Password);
-        }
-
+        }  
     }
 }

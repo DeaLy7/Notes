@@ -9,8 +9,6 @@ namespace Notes.BusinessLogic.Interfaces
         void UpdateNote(Note note);
         Note? GetNoteById(int id);
         List<Note> GetAllNotes(int userId);
-        void CreateUser(User user);
-        List<User> GetAllUsers();
-        User LogIn(User user);
+        
     }
 }
