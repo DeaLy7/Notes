@@ -1,8 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Notes.BusinessLogic.Interfaces;
 using Notes.BusinessLogic.Services;
 using Notes.ConsoleApp.Controllers;
 using Notes.DataAccess.Data.Models;
+using Notes.DataAccess.Interfaces;
 using Notes.DataAccess.Repositories;
 
 namespace Notes.ConsoleApp
@@ -24,11 +27,29 @@ namespace Notes.ConsoleApp
             var dbContext = new NotesDbContext(dbContextOptionsBuilder.Options);
             var noteRepository = new NoteRepository(dbContext);
             var noteService = new NoteService(noteRepository);
-            var noteController = new NoteControllers(noteService);
+            
             
             var userRepository = new UserRepository(dbContext);
             var userService = new UserService(userRepository);
-            var userController = new UserControllers(userService);
+
+             IServiceProvider GetServiceProvider()
+             {
+                IServiceCollection services = new ServiceCollection()
+               .AddTransient<INoteRepository, NoteRepository>()
+               .AddTransient<IUserRepository, UserRepository>()
+               .AddTransient<IUserService, UserService>()
+               .AddTransient<INoteService, NoteService>()
+               .AddTransient<NoteControllers>()
+               .AddTransient<UserControllers>()
+               .AddDbContext<NotesDbContext>(options => options.UseSqlite(connectionString));
+                using ServiceProvider serviceProvider = services.BuildServiceProvider();
+            
+                return services.BuildServiceProvider();
+             }
+            
+            var serviceProvider = GetServiceProvider();
+            var userController = serviceProvider.GetRequiredService<UserControllers>();
+            var noteController = serviceProvider.GetRequiredService<NoteControllers>();
 
             Note note = new();
             User user = new();
@@ -37,7 +58,7 @@ namespace Notes.ConsoleApp
             {
                 if (user.Id == 0)
                 {
-                    Console.WriteLine("1 - Sign in | 2 - Sign up");
+                    Console.WriteLine("1 - Sign in | 2 - Sign up | 3 - Exit ");
 
                     int menu = Convert.ToInt32(Console.ReadLine());
                     Console.Clear();
@@ -66,6 +87,9 @@ namespace Notes.ConsoleApp
                             Console.Write("Success\n");
                             Console.ReadLine();
                             Console.Clear();
+                            break;
+                        case 3:
+                            Exit = true;
                             break;
 
                     }
