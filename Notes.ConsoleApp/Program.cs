@@ -14,26 +14,19 @@ namespace Notes.ConsoleApp
     {
         static void Main(string[] args)
         {
-            IConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-            configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
-            configurationBuilder.AddJsonFile("appsettings.json");
+           
 
-            var configuration = configurationBuilder.Build();
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            IConfiguration GetConfiguration()
+            {
+                var builder = new ConfigurationBuilder();
+                builder.SetBasePath(Directory.GetCurrentDirectory());
+                builder.AddJsonFile("appsettings.json");
+                return builder.Build();
+            }
 
-            var dbContextOptionsBuilder = new DbContextOptionsBuilder<NotesDbContext>();
-            dbContextOptionsBuilder.UseSqlite(connectionString);
-
-            var dbContext = new NotesDbContext(dbContextOptionsBuilder.Options);
-            var noteRepository = new NoteRepository(dbContext);
-            var noteService = new NoteService(noteRepository);
-            
-            
-            var userRepository = new UserRepository(dbContext);
-            var userService = new UserService(userRepository);
-
-             IServiceProvider GetServiceProvider()
+             IServiceProvider GetServiceProvider(IConfiguration config)
              {
+                var connectionString = config.GetConnectionString("DefaultConnection");
                 IServiceCollection services = new ServiceCollection()
                .AddTransient<INoteRepository, NoteRepository>()
                .AddTransient<IUserRepository, UserRepository>()
@@ -42,12 +35,13 @@ namespace Notes.ConsoleApp
                .AddTransient<NoteControllers>()
                .AddTransient<UserControllers>()
                .AddDbContext<NotesDbContext>(options => options.UseSqlite(connectionString));
-                using ServiceProvider serviceProvider = services.BuildServiceProvider();
+               
             
                 return services.BuildServiceProvider();
              }
             
-            var serviceProvider = GetServiceProvider();
+            var config = GetConfiguration();
+            var serviceProvider = GetServiceProvider(config);
             var userController = serviceProvider.GetRequiredService<UserControllers>();
             var noteController = serviceProvider.GetRequiredService<NoteControllers>();
 
