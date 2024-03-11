@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Notes.BusinessLogic.Interfaces;
 using Notes.BusinessLogic.Services;
@@ -9,31 +10,19 @@ using Notes.DataAccess.Interfaces;
 using Notes.DataAccess.Repositories;
 using System.Runtime.CompilerServices;
 
+
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services
+       .AddTransient<INoteRepository, NoteRepository>()
+       .AddTransient<IUserRepository, UserRepository>()
+       .AddTransient<IUserService, UserService>()
+       .AddTransient<INoteService, NoteService>()       
+       .AddDbContext<NotesDbContext>(options => options.UseSqlite(connectionString));
+builder.Services.AddControllers();
+builder.Services.AddSwaggerGen ();
+               
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
 
 app.Run();
-IConfiguration GetConfiguration()
-{
-    var builder = new ConfigurationBuilder();
-    builder.SetBasePath(Directory.GetCurrentDirectory());
-    builder.AddJsonFile("appsettings.json");
-    return builder.Build();
-}
-
-IServiceProvider GetServiceProvider(IConfiguration config)
-{
-    var connectionString = config.GetConnectionString("DefaultConnection");
-    IServiceCollection services = new ServiceCollection()
-   .AddTransient<INoteRepository, NoteRepository>()
-   .AddTransient<IUserRepository, UserRepository>()
-   .AddTransient<IUserService, UserService>()
-   .AddTransient<INoteService, NoteService>()
-   .AddTransient<NoteControllers>()
-   .AddTransient<UsersController>()
-   .AddDbContext<NotesDbContext>(options => options.UseSqlite(connectionString));
-    services.AddControllers();
-    return services.BuildServiceProvider();
-}
